@@ -1,0 +1,7 @@
+services:
+  organization-checker:
+    build: .
+    environment:
+      - GITHUB_TOKEN=${GITHUB_TOKEN_ORG}
+    stdin_open: true
+    tty: true
