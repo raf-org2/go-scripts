@@ -1,0 +1,11 @@
+name: Dependabot Auto-merge
+on: push
+
+jobs:
+  dependabot:
+    runs-on: [self-hosted, dependabot-runner]  
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Dependabot metadata
+        run: echo "Running on self-hosted runner"
