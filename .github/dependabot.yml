@@ -4,6 +4,4 @@ updates:
     directory: "/" 
     target-branch: "main"
     schedule:
-      interval: "daily" 
-    runs-on: dependabot-runner
-
+      interval: "daily"
