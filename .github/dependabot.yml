@@ -6,3 +6,5 @@ updates:
     target-branch: "main"
     schedule:
       interval: "daily"
+    labels:
+      - "dependabot-runner"  
