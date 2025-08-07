@@ -1,0 +1,9 @@
+version: 2
+updates:
+  - package-ecosystem: "gomod" 
+    directory: "/" 
+    target-branch: "test-runner"
+    schedule:
+      interval: "weekly" 
+    labels:
+      - "dependabot-runner" 
