@@ -4,10 +4,6 @@ updates:
     directory: "/" 
     target-branch: "main"
     schedule:
-      interval: "weekly" 
-    labels:
-      - "dependabot-PR" 
-    metadata:
-      runner: "self-hosted"
-      group: "dependabot-runner"  
+      interval: "daily" 
+    runs-on: dependabot-runner
 
