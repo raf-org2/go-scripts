@@ -6,4 +6,4 @@ updates:
     schedule:
       interval: "weekly" 
     labels:
-      - "dependabot-runner-1" 
+      - "dependabot-runner" 
