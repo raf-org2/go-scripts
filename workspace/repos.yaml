@@ -1,0 +1,20 @@
+repositories:
+    - GHAS-public
+    - GHAS-private
+    - GHAS-public-2
+    - juice-shop
+    - verademo
+    - skills-secure-repository-supply-chain
+    - skills-introduction-to-secret-scanning
+    - introduction-to-codeql
+    - exercise-reference-a-codeql-query
+    - change-commit-history
+    - dependabot-test
+    - .github
+    - security
+    - GHAS-automation-scripts
+    - go-scripts
+    - python-scripts
+    - test-default
+    - dependabot
+    - ARC

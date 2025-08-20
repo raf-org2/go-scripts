@@ -5,3 +5,5 @@ services:
       - GITHUB_TOKEN=${GITHUB_TOKEN_ORG}
     stdin_open: true
     tty: true
+    volumes:
+      - ./workspace:/workspace
