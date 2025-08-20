@@ -18,15 +18,17 @@ COPY *.go ./
 # Download dependencies and tidy
 RUN go mod tidy && go mod download
 
-# Build all applications
-
 # Build organization-check
 RUN go build -o organization-check organization-check.go
 
 # Build get_org_repos
 RUN go build -o get_org_repos get_org_repos.go
+
 # Build create_org_config
 RUN go build -o create_org_config create_org_config.go
+
+# Build update_org_config
+RUN go build -o update_org_config update_org_config.go
 
 # Final stage
 FROM alpine:latest
@@ -35,11 +37,10 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /app
 
-
 # Copy all binaries from builder stage
 COPY --from=builder /app/organization-check /app/
 COPY --from=builder /app/get_org_repos /app/
-COPY --from=builder /app/create_org_config /app/
 
-# Default entrypoint (can be overridden)
-ENTRYPOINT ["/app/get_org_repos"]
+COPY --from=builder /app/create_org_config /app/
+COPY --from=builder /app/update_org_config /app/
+

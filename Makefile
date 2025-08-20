@@ -1,21 +1,33 @@
+ORG=raf-org2
+YAML=/workspace/org_config.yaml
+
 # Get all repository names under an organization and store in a yaml file
 get-org-repos:
-	@if [ -z "$(ORG)" ] || [ -z "$(TOKEN)" ]; then \
+	@if [ -z "$(ORG)" ] || [ -z "$(GITHUB_TOKEN_ORG)" ]; then \
 		echo "Usage: make get-org-repos ORG=my-org TOKEN=ghp_xxx [OUTPUT=repos.yaml]"; \
 		exit 1; \
 	fi
 	docker-compose run --rm --entrypoint /app/get_org_repos organization-checker \
-		-token $(TOKEN) -org $(ORG) -output $${OUTPUT:-/workspace/repos.yaml}
+		-token $(GITHUB_TOKEN_ORG) -org $(ORG) -output $${OUTPUT:-/workspace/repos.yaml}
 .PHONY: build run shell clean init help organization-check
 
 # Create org code security configuration from yaml
 create-org-config:
-	@if [ -z "$(ORG)" ] || [ -z "$(TOKEN)" ] || [ -z "$(YAML)" ]; then \
-		echo "Usage: make create-org-config ORG=my-org TOKEN=ghp_xxx YAML=/workspace/sample_org_config.yaml"; \
+	@if [ -z "$(ORG)" ] || [ -z "$(GITHUB_TOKEN_ORG)" ] || [ -z "$(YAML)" ]; then \
+		echo "Usage: make create-org-config ORG=my-org TOKEN=ghp_xxx YAML=/workspace/org_config.yaml"; \
 		exit 1; \
 	fi
 	docker-compose run --rm --entrypoint /app/create_org_config organization-checker \
-		-org $(ORG) -token $(TOKEN) -yaml $(YAML)
+		-org $(ORG) -token $(GITHUB_TOKEN_ORG) -yaml $(YAML)
+
+# Update org code security configuration from yaml (shows diff and asks for confirmation)
+update-org-config:
+	@if [ -z "$(ORG)" ] || [ -z "$(GITHUB_TOKEN_ORG)" ] || [ -z "$(YAML)" ]; then \
+		echo "Usage: make update-org-config ORG=my-org TOKEN=ghp_xxx YAML=/workspace/org_config.yaml"; \
+		exit 1; \
+	fi
+	docker-compose run --rm --entrypoint /app/update_org_config organization-checker \
+		-org $(ORG) -token $(GITHUB_TOKEN_ORG) -yaml $(YAML)
 # Initialize go.sum file
 init:
 	docker run --rm -v $(PWD):/workspace -w /workspace golang:1.21-alpine sh -c "apk add --no-cache git && go mod tidy"
@@ -53,3 +65,7 @@ help:
 	@echo "Quick start for testing:"
 	@echo "  export GITHUB_TOKEN=your_token_here"
 	@echo "  make organization-check"
+
+# Debug volume mount: list files in /workspace inside the container
+check-workspace:
+	docker-compose run --rm organization-checker ls -l /workspace
