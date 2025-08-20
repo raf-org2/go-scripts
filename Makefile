@@ -1,5 +1,6 @@
 ORG=raf-org2
 YAML=/workspace/org_config.yaml
+REPO=security
 
 # Get all repository names under an organization and store in a yaml file
 get-org-repos:
@@ -28,6 +29,16 @@ update-org-config:
 	fi
 	docker-compose run --rm --entrypoint /app/update_org_config organization-checker \
 		-org $(ORG) -token $(GITHUB_TOKEN_ORG) -yaml $(YAML)
+
+# Add a repository to the sample configuration
+add-repo-to-config:
+	@if [ -z "$(ORG)" ] || [ -z "$(GITHUB_TOKEN_ORG)" ] || [ -z "$(REPO)" ]; then \
+		echo "Usage: make add-repo-to-config ORG=my-org TOKEN=ghp_xxx REPO=my-repo|all [CONFIG=sample]"; \
+		exit 1; \
+	fi
+	docker-compose run --rm --entrypoint /app/add_repo_to_config organization-checker \
+		-org $(ORG) -token $(GITHUB_TOKEN_ORG) -repo $(REPO) -config $${CONFIG:-sample}
+
 # Initialize go.sum file
 init:
 	docker run --rm -v $(PWD):/workspace -w /workspace golang:1.21-alpine sh -c "apk add --no-cache git && go mod tidy"
@@ -49,7 +60,6 @@ clean:
 	docker-compose down --rmi all --volumes --remove-orphans
 
 # Help command
-help:
 	@echo "Available commands:"
 	@echo "  init           - Initialize go.sum file"
 	@echo "  build          - Build the Docker image"
@@ -57,6 +67,9 @@ help:
 	@echo "  organization-check - Test enterprise and organization access"
 	@echo "  get-org-repos  - Get all repository names under an organization and store in a yaml file"
 	@echo "  create-org-config - Create org code security configuration from a yaml file"
+	@echo "  add-repo-to-config - Attach a configuration to a repo or all repos:"
+	@echo "      make add-repo-to-config REPO=my-repo [CONFIG=sample]"
+	@echo "      make add-repo-to-config REPO=all [CONFIG=sample]"
 	@echo "  shell          - Open a shell in the container"
 	@echo "  clean          - Clean up Docker resources"
 	@echo ""

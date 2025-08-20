@@ -30,6 +30,9 @@ RUN go build -o create_org_config create_org_config.go
 # Build update_org_config
 RUN go build -o update_org_config update_org_config.go
 
+# Build add_repo_to_config
+RUN go build -o add_repo_to_config add_repo_to_config.go
+
 # Final stage
 FROM alpine:latest
 
@@ -43,4 +46,6 @@ COPY --from=builder /app/get_org_repos /app/
 
 COPY --from=builder /app/create_org_config /app/
 COPY --from=builder /app/update_org_config /app/
+
+COPY --from=builder /app/add_repo_to_config /app/
 
