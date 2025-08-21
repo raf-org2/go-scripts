@@ -1,3 +1,4 @@
+
 package main
 
 import (
@@ -14,6 +15,17 @@ import (
 
 	"gopkg.in/yaml.v3"
 )
+
+// Reviewer represents a reviewer for delegated bypass
+type Reviewer struct {
+	ReviewerID   int    `yaml:"reviewer_id" json:"reviewer_id"`
+	ReviewerType string `yaml:"reviewer_type" json:"reviewer_type"`
+}
+
+// SecretScanningDelegatedBypassOptions represents the options for delegated bypass
+type SecretScanningDelegatedBypassOptions struct {
+	Reviewers []Reviewer `yaml:"reviewers" json:"reviewers"`
+}
 
 type DependencyGraphAutosubmitActionOptions struct {
 	LabeledRunners bool `yaml:"labeled_runners" json:"labeled_runners"`
@@ -40,8 +52,13 @@ type CodeSecurityConfig struct {
 	SecretScanningPushProtection       string `yaml:"secret_scanning_push_protection" json:"secret_scanning_push_protection"`
 	SecretScanningValidityChecks       string `yaml:"secret_scanning_validity_checks" json:"secret_scanning_validity_checks"`
 	SecretScanningNonProviderPatterns  string `yaml:"secret_scanning_non_provider_patterns" json:"secret_scanning_non_provider_patterns"`
+	SecretScanningGenericSecrets       string `yaml:"secret_scanning_generic_secrets" json:"secret_scanning_generic_secrets"`
+	SecretScanningDelegatedBypass      string `yaml:"secret_scanning_delegated_bypass" json:"secret_scanning_delegated_bypass"`
+	SecretScanningDelegatedBypassOptions SecretScanningDelegatedBypassOptions `yaml:"secret_scanning_delegated_bypass_options" json:"secret_scanning_delegated_bypass_options"`
+	SecretScanningDelegatedAlertDismissal string `yaml:"secret_scanning_delegated_alert_dismissal" json:"secret_scanning_delegated_alert_dismissal"`
 	PrivateVulnerabilityReporting      string `yaml:"private_vulnerability_reporting" json:"private_vulnerability_reporting"`
 	Enforcement                        string `yaml:"enforcement" json:"enforcement"`
+	DefaultForNewRepos                bool   `yaml:"default_for_new_repos" json:"default_for_new_repos"`
 }
 
 func main() {
@@ -133,8 +150,13 @@ func main() {
 		SecretScanningPushProtection       string      `json:"secret_scanning_push_protection"`
 		SecretScanningValidityChecks       string      `json:"secret_scanning_validity_checks"`
 		SecretScanningNonProviderPatterns  string      `json:"secret_scanning_non_provider_patterns"`
+		SecretScanningGenericSecrets       string      `json:"secret_scanning_generic_secrets"`
+		SecretScanningDelegatedBypass      string      `json:"secret_scanning_delegated_bypass"`
+		SecretScanningDelegatedBypassOptions SecretScanningDelegatedBypassOptions `json:"secret_scanning_delegated_bypass_options"`
+		SecretScanningDelegatedAlertDismissal string `json:"secret_scanning_delegated_alert_dismissal"`
 		PrivateVulnerabilityReporting      string      `json:"private_vulnerability_reporting"`
 		Enforcement                        string      `json:"enforcement"`
+		DefaultForNewRepos                bool        `json:"default_for_new_repos"`
 	}
 	reqBody := CodeSecurityConfigRequest{
 		Name: newConfig.Name,
@@ -151,8 +173,13 @@ func main() {
 		SecretScanningPushProtection: newConfig.SecretScanningPushProtection,
 		SecretScanningValidityChecks: newConfig.SecretScanningValidityChecks,
 		SecretScanningNonProviderPatterns: newConfig.SecretScanningNonProviderPatterns,
+		SecretScanningGenericSecrets: newConfig.SecretScanningGenericSecrets,
+		SecretScanningDelegatedBypass: newConfig.SecretScanningDelegatedBypass,
+		SecretScanningDelegatedBypassOptions: newConfig.SecretScanningDelegatedBypassOptions,
+		SecretScanningDelegatedAlertDismissal: newConfig.SecretScanningDelegatedAlertDismissal,
 		PrivateVulnerabilityReporting: newConfig.PrivateVulnerabilityReporting,
 		Enforcement: newConfig.Enforcement,
+	DefaultForNewRepos: newConfig.DefaultForNewRepos,
 	}
 	jsonBody, err := json.Marshal(reqBody)
 	if err != nil {

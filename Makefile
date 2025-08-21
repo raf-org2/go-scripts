@@ -1,11 +1,11 @@
 ORG=raf-org2
-YAML=/workspace/org_config.yaml
+YAML=/workspace/tlc_config.yaml
 REPO=security
 
 # Get all repository names under an organization and store in a yaml file
 get-org-repos:
 	@if [ -z "$(ORG)" ] || [ -z "$(GITHUB_TOKEN_ORG)" ]; then \
-		echo "Usage: make get-org-repos ORG=my-org TOKEN=ghp_xxx [OUTPUT=repos.yaml]"; \
+		echo "Usage: make get-org-repos ORG=my-org TOKEN=<redacted> [OUTPUT=repos.yaml]"; \
 		exit 1; \
 	fi
 	docker-compose run --rm --entrypoint /app/get_org_repos organization-checker \
@@ -15,7 +15,7 @@ get-org-repos:
 # Create org code security configuration from yaml
 create-org-config:
 	@if [ -z "$(ORG)" ] || [ -z "$(GITHUB_TOKEN_ORG)" ] || [ -z "$(YAML)" ]; then \
-		echo "Usage: make create-org-config ORG=my-org TOKEN=ghp_xxx YAML=/workspace/org_config.yaml"; \
+		echo "Usage: make create-org-config ORG=my-org TOKEN=<redacted> YAML=/workspace/org_config.yaml"; \
 		exit 1; \
 	fi
 	docker-compose run --rm --entrypoint /app/create_org_config organization-checker \
@@ -24,7 +24,7 @@ create-org-config:
 # Update org code security configuration from yaml (shows diff and asks for confirmation)
 update-org-config:
 	@if [ -z "$(ORG)" ] || [ -z "$(GITHUB_TOKEN_ORG)" ] || [ -z "$(YAML)" ]; then \
-		echo "Usage: make update-org-config ORG=my-org TOKEN=ghp_xxx YAML=/workspace/org_config.yaml"; \
+		echo "Usage: make update-org-config ORG=my-org TOKEN=<redacted> YAML=/workspace/org_config.yaml"; \
 		exit 1; \
 	fi
 	docker-compose run --rm --entrypoint /app/update_org_config organization-checker \
@@ -33,7 +33,7 @@ update-org-config:
 # Add a repository to the sample configuration
 add-repo-to-config:
 	@if [ -z "$(ORG)" ] || [ -z "$(GITHUB_TOKEN_ORG)" ] || [ -z "$(REPO)" ]; then \
-		echo "Usage: make add-repo-to-config ORG=my-org TOKEN=ghp_xxx REPO=my-repo|all [CONFIG=sample]"; \
+		echo "Usage: make add-repo-to-config ORG=my-org TOKEN=<redacted> REPO=my-repo|all [CONFIG=sample]"; \
 		exit 1; \
 	fi
 	docker-compose run --rm --entrypoint /app/add_repo_to_config organization-checker \

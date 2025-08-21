@@ -21,3 +21,21 @@ secret_scanning_validity_checks: "enabled"
 secret_scanning_non_provider_patterns: "enabled"
 private_vulnerability_reporting: "disabled"
 enforcement: "enforced"
+default_for_new_repos: false
+
+# enforcement: "enforced", "not_enforced"
+# advanced_security: "enabled", "disabled"
+# dependency_graph: "enabled", "disabled"
+# dependency_graph_autosubmit_action: "not_set", "enabled", "disabled"
+# dependency_graph_autosubmit_action_options.labeled_runners: true, false
+# dependabot_alerts: "enabled", "disabled"
+# dependabot_security_updates: "enabled", "disabled", "not_set"
+# code_scanning_default_setup: "enabled", "disabled"
+# code_scanning_default_setup_options.runner_type: "not_set", "github-hosted", "self-hosted"
+# code_scanning_default_setup_options.runner_label: null or a string label (if runner_type is "self-hosted")
+# secret_scanning: "enabled", "disabled"
+# secret_scanning_push_protection: "enabled", "disabled"
+# secret_scanning_validity_checks: "enabled", "disabled"
+# secret_scanning_non_provider_patterns: "enabled", "disabled"
+# private_vulnerability_reporting: "enabled", "disabled"
+# default_for_new_repos: true, false
