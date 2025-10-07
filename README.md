@@ -5,10 +5,15 @@ A Go application for analyzing GitHub organization-level security features and a
 ## 🚀 Features
 
 1 - Analyze GHAS features across all repositories in your organization
+
 2 - List allrepositories
+
 3 - Create a Organization Security configuration template
+
 4 - Update Security configuration
+
 5 - Add repositories to the configuration
+
 6 - Create a advanced filtered list of repositories
 
 ## 🛠️ Prerequisites
