@@ -2,20 +2,14 @@
 
 A Go application for analyzing GitHub organization-level security features and advanced security settings across all repositories in your organizations.
 
-## 📋 Overview
-
-This repository contains a comprehensive tool for GitHub organization security analysis:
-
-- **`organization-check.go`** - Analyze security settings across all repositories in your GitHub organizations
-
 ## 🚀 Features
 
-- **Organization Analysis**: List all organizations you're a member of with repository counts
-- **Security Settings Review**: Check GitHub Advanced Security (GHAS) features across repositories
-- **Comprehensive Coverage**: Analyze Secret Scanning, Code Scanning (CodeQL), Dependabot, and more
-- **Enterprise Support**: Works with GitHub Enterprise and organization-level access
-- **Dockerized Environment**: Run everything in a consistent containerized environment
-- **Detailed Reporting**: Visual indicators for enabled/disabled security features
+1 - Analyze GHAS features across all repositories in your organization
+2 - List allrepositories
+3 - Create a Organization Security configuration template
+4 - Update Security configuration
+5 - Add repositories to the configuration
+6 - Create a advanced filtered list of repositories
 
 ## 🛠️ Prerequisites
 
@@ -44,108 +38,80 @@ This repository contains a comprehensive tool for GitHub organization security a
    make build
    ```
 
-## 📖 Usage
-
-### Run Organization Security Analysis
-
-Analyze all your organization memberships and their security settings:
-
-```bash
-make organization-check
-```
-
-This comprehensive analysis will show:
-
-#### 👤 **User Information**
-- Your authenticated user details
-- Associated email and company
-
-#### 🏢 **Organization Memberships**
-- List of all organizations you're a member of
-- Repository count for each organization
-- Your role and membership status in each org
-
-#### 🛡️ **Security Analysis for Each Repository**
-- **Secret Scanning**: Status and configuration
-- **Secret Scanning Push Protection**: Whether push protection is enabled
-- **Advanced Security**: GitHub Advanced Security status
-- **Dependabot Security Updates**: Dependency vulnerability scanning
-- **Code Scanning (CodeQL)**: Static analysis security scanning
-- **Dependabot Alerts**: Active dependency vulnerability alerts
-- **Repository Type**: Private vs public (affects available features)
-
-### Development & Debugging
-
-Open a shell in the container for development:
-
-```bash
-make shell
-```
-
 ## 🔧 Manual Usage (without Docker)
 
 If you prefer to run the tool directly:
 
-1. **Install dependencies**:
+1. **Ensure you have Go installed** (version 1.23 or later).
+
+2. **Install dependencies**:
    ```bash
    go mod tidy
    ```
 
-2. **Set environment variable**:
+3. **Set environment variable**:
    ```bash
    export GITHUB_TOKEN=your_github_token_here
+   export GITHUB_ENDPOINT=GHEC  # or GHES for GitHub Enterprise Server
+   export GHES_URL=https://your-ghes-domain/api/v3  # Only for GHES
    ```
 
-3. **Run the tool**:
+## ORGANIZATION CHECK
+
    ```bash
    go run organization-check.go
    ```
+
+## GET ORGANIZATION REPOSITORIES
+
+   ```bash
+   go run get_org_repos.go -org org-name -output workspace/repos.yaml
+   ```
+## ADVANCED FILTER
+
+   ```bash
+   # using isProduction filter only
+   go run advanced_filter.go -org org-name
+
+   # using isProduction for public repos only
+   go run advanced_filter.go -org org-name -public-prod-outFile "{orgname}-prod-public.txt"
+   ```
+
+## CREATE SECURITY CONFIGURATION
+   
+   ```bash
+   go run create_org_config.go -org org-name -yaml workspace/{org-name}.yaml
+   ```
+
+## UPDATE SECURITY CONFIGURATION
+
+   ```bash
+   go run update_org_config.go -org org-name -yaml workspace/{org-name}.yaml
+   ```
+
+## ADD REPOSITORIES TO CONFIGURATION
+
+   ```bash
+   # A single repository
+   go run add_repo_to_config.go -org org-name -repo repo-name -config config-name
+
+   # A specific repository
+   go run add_repo_to_config.go -org org-name -repo "repo1,repo2,repo3" -config config-name
+
+   # All repositories from a file
+   go run add_repo_to_config.go -org org-name -repo repo-name -config config-name
+
+   # All repositories
+   go run add_repo_to_config.go -org org-name -repo all -config config-name
+   ```
+
+
 
 ### Sample Output
 
 
 ![sample](./images/sample-output.png)
 
-## 📜 License
-
-This project is licensed under the terms specified in the LICENSE file.
-
-## ⚠️ Security Considerations
-
-- **Never commit tokens**: Keep your GitHub token secure and out of version control
-- **Use environment variables**: Store tokens in `GITHUB_TOKEN_ORG` environment variable
-- **Minimal permissions**: Ensure your token has only required scopes
-- **Regular rotation**: Rotate access tokens regularly for security
-
-## 🆘 Troubleshooting
-
-### Common Issues
-
-**"GitHub token is required"**
-- Set `GITHUB_TOKEN_ORG` environment variable
-- Or ensure the token is properly exported in your shell
-
-**"Failed to list organizations"**
-- Verify token has `admin:org` scope (if needed)
-- Check if you're actually a member of any organizations
-
-**"Access denied or error" for security features**
-- Ensure token has `security_events` scope
-- Verify you have appropriate permissions for the repository
-- Some features require admin access to the repository
-
-**"Not configured" for Code Scanning or Dependabot**
-- Features may not be enabled for the repository
-- Check if GitHub Advanced Security is enabled for private repos
-- Verify organization/enterprise policies
-
-### Getting Help
-
-If you encounter issues:
-1. Check that your token has the required scopes
-2. Verify your organization membership and permissions
-3. Review GitHub's documentation on Advanced Security features
-4. Check organization/enterprise policies that may affect feature availability
 
 ## 🔗 Additional Resources
 

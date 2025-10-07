@@ -19,7 +19,8 @@ RUN go build -o organization-check organization-check.go && \
     go build -o get_org_repos get_org_repos.go && \
     go build -o create_org_config create_org_config.go && \
     go build -o update_org_config update_org_config.go && \
-    go build -o add_repo_to_config add_repo_to_config.go
+    go build -o add_repo_to_config add_repo_to_config.go && \
+    go build -o advanced_filter advanced_filter.go 
 
 # Final minimal image (optional, for prod/test)
 FROM alpine:latest
@@ -33,6 +34,7 @@ COPY --from=dev /app/get_org_repos /app/
 COPY --from=dev /app/create_org_config /app/
 COPY --from=dev /app/update_org_config /app/
 COPY --from=dev /app/add_repo_to_config /app/
+COPY --from=dev /app/advanced_filter /app/
 
 # Set default command (edit as needed)
 CMD ["./create_org_config"]

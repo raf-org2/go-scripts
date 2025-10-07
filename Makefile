@@ -10,7 +10,7 @@ get-org-repos:
 	fi
 	docker-compose run --rm --entrypoint /app/get_org_repos organization-checker \
 		-token $(GITHUB_TOKEN_ORG) -org $(ORG) -output $${OUTPUT:-/workspace/repos.yaml}
-.PHONY: build run shell clean init help organization-check
+.PHONY: build run shell clean init help organization-check advanced-filter
 
 # Create org code security configuration from yaml
 create-org-config:
@@ -50,6 +50,16 @@ build: init
 # Test enterprise and organization access
 organization-check:
 	docker-compose run --rm --entrypoint ./organization-check organization-checker
+
+# Advanced property-based repository filter
+advanced-filter:
+	@if [ -z "$(ORG)" ] || [ -z "$(GITHUB_TOKEN_ORG)" ]; then \
+		echo "Usage: make advanced-filter ORG=my-org TOKEN=<redacted> [PROPERTY=isProduction] [VALUE=yes]"; \
+		exit 1; \
+	fi
+	# PROPERTY and VALUE are optional overrides
+	docker-compose run --rm --entrypoint /app/advanced_filter organization-checker \
+		-org $(ORG) -token $(GITHUB_TOKEN_ORG) -property $${PROPERTY:-isProduction} -value $${VALUE:-yes}
 
 # Open a shell in the container for development
 shell:

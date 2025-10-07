@@ -63,11 +63,32 @@ type CodeSecurityConfig struct {
 
 func main() {
 	yamlPath := flag.String("yaml", "", "Path to YAML file with new configuration")
-	token := flag.String("token", "", "GitHub API token")
+	tokenFlag := flag.String("token", "", "GitHub API token")
 	org := flag.String("org", "", "GitHub Organization name (e.g. my-org)")
+	ghesURL := flag.String("ghes-url", "", "Base URL for GHES api (ignored for GHEC)")
 	flag.Parse()
 
-	if *yamlPath == "" || *token == "" || *org == "" {
+	// GHES_URL env var fallback
+	if *ghesURL == "" {
+		if envURL := os.Getenv("GHES_URL"); envURL != "" {
+			*ghesURL = strings.TrimRight(envURL, "/")
+		}
+	}
+
+	token := strings.TrimSpace(*tokenFlag)
+
+	if token == "" {
+		token = os.Getenv("GITHUB_TOKEN_ORG")
+	}
+	if token == "" {
+		token = os.Getenv("GITHUB_TOKEN")
+	}
+	if token == "" {
+		fmt.Fprintln(os.Stderr, "GitHub token must be provided via -token flag or GITHUB_TOKEN_ORG / GITHUB_TOKEN environment variable")
+		os.Exit(1)
+	}
+
+	if *yamlPath == "" || token == "" || *org == "" {
 		log.Fatal("Usage: go run update_org_config.go -yaml config.yaml -token <token> -org <org>")
 	}
 
@@ -82,7 +103,17 @@ func main() {
 	}
 
 	// Read current config from GitHub
-	url := fmt.Sprintf("https://api.github.com/orgs/%s/code-security/configurations", *org)
+	githubEndpoint := os.Getenv("GITHUB_ENDPOINT")
+	var url string
+	switch githubEndpoint {
+	case "GHEC":
+		url = fmt.Sprintf("https://api.github.com/orgs/%s/code-security/configurations", *org)
+	case "GHES":
+		if *ghesURL == "" { log.Fatal("Set -ghes-url or GHES_URL when GITHUB_ENDPOINT=GHES") }
+		url = fmt.Sprintf("%s/orgs/%s/code-security/configurations", *ghesURL, *org)
+	default:
+		log.Fatalf("GITHUB_ENDPOINT environment variable must be set to either GHEC or GHES, or left unset for GHES as default")
+	}	
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatalf("Failed to create request: %v", err)
@@ -199,10 +230,14 @@ func main() {
 	var updateReq *http.Request
 	if configID != 0 {
 		// PATCH to update existing config using integer ID
-		patchURL := fmt.Sprintf("https://api.github.com/orgs/%s/code-security/configurations/%d", *org, configID)
-		updateReq, err = http.NewRequest("PATCH", patchURL, bytes.NewBuffer(jsonBody))
-		if err != nil {
-			log.Fatalf("Failed to create PATCH request: %v", err)
+		var patchURL string
+		switch githubEndpoint {
+		case "GHEC":
+			patchURL = fmt.Sprintf("https://api.github.com/orgs/%s/code-security/configurations/%d", *org, configID)
+		case "GHES":
+			patchURL = fmt.Sprintf("%s/orgs/%s/code-security/configurations/%d", *ghesURL, *org, configID)
+		default:
+			log.Fatalf("GITHUB_ENDPOINT environment variable must be set to either GHEC or GHES, or left unset for GHES as default")
 		}
 	} else {
 		// POST to create new config
@@ -213,7 +248,7 @@ func main() {
 	}
 
 	updateReq.Header.Set("Accept", "application/vnd.github+json")
-	updateReq.Header.Set("Authorization", "Bearer "+*token)
+	updateReq.Header.Set("Authorization", "Bearer "+ token)
 	updateReq.Header.Set("X-GitHub-Api-Version", "2022-11-28")
 	updateReq.Header.Set("Content-Type", "application/json")
 	updateResp, err := client.Do(updateReq)

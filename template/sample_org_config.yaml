@@ -1,23 +1,43 @@
-# Sample GitHub Organization code security configuration YAML
-# Fill in or modify values as needed
+# Sample Organization Configuration
+# GHES 3.16
 
-target_type: "organization"
-name: "Org recommended settings"
-description: "This is a code security configuration for my-org repositories"
+#target_type: "organization"
+name: "TLC_standard"
+description: "TLC Standard Security Configuration"
+
+# Dependency Scanning
+
 advanced_security: "enabled"
 dependency_graph: "enabled"
 dependency_graph_autosubmit_action: "not_set"
 dependency_graph_autosubmit_action_options:
   labeled_runners: false
 dependabot_alerts: "enabled"
-dependabot_security_updates: "not_set"
-code_scanning_default_setup: "enabled"
-code_scanning_default_setup_options:
-  runner_type: "not_set"
-  runner_label: null
+dependabot_security_updates: "disabled"
+private_vulnerability_reporting: "enabled"
+
+# Secret Scanning
 secret_scanning: "enabled"
-secret_scanning_push_protection: "enabled"
 secret_scanning_validity_checks: "enabled"
 secret_scanning_non_provider_patterns: "enabled"
-private_vulnerability_reporting: "enabled"
-enforcement: "enforced"
+secret_scanning_generic_secrets: "disabled" # AI
+secret_scanning_push_protection: "enabled"
+secret_scanning_delegated_bypass: "enabled"
+secret_scanning_delegated_bypass_options:
+  reviewers:
+    - reviewer_id: 5 # Github internal ID for the Repository admin
+      reviewer_type: "ROLE"
+secret_scanning_delegated_alert_dismissal: "not_set"
+
+# Code Scanning
+code_scanning_default_setup: "enabled"
+code_scanning_default_setup_options:
+  runner_type: "labelled"
+  runner_label: "code-scanning"
+code_scanning_options:
+  allow_advanced: true
+code_scanning_delegated_alert_dismissal: "not_set"
+
+# Policy
+default_for_new_repos: all # all, none, public, private, internal
+enforcement: "enforced" 
