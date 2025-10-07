@@ -14,9 +14,19 @@ import (
 
 func main() {
 	var (
-		token = flag.String("token", "", "GitHub token (or set GITHUB_TOKEN env var)")
+		token   = flag.String("token", "", "GitHub token (or set GITHUB_TOKEN env var)")
+		ghesURL = flag.String("ghes-url", "", "Base URL for GHES api (ignored for GHEC)")
 	)
 	flag.Parse()
+
+	// Allow GHES URL to be supplied via GHES_URL env var if -ghes-url not provided
+	if *ghesURL == "" {
+		if envURL := os.Getenv("GHES_URL"); envURL != "" {
+			// Trim any trailing slash for consistency
+			trimmed := strings.TrimRight(envURL, "/")
+			ghesURL = &trimmed
+		}
+	}
 
 	// Get token from flag or environment
 	githubToken := *token
@@ -33,7 +43,23 @@ func main() {
 		&oauth2.Token{AccessToken: githubToken},
 	)
 	tc := oauth2.NewClient(ctx, ts)
-	client := github.NewClient(tc)
+	githubEndpoint := os.Getenv("GITHUB_ENDPOINT")
+	var client *github.Client
+	switch githubEndpoint {
+	case "GHEC":
+		client = github.NewClient(tc)
+	case "GHES":
+		if ghesURL == nil || *ghesURL == "" {
+			log.Fatal("When GITHUB_ENDPOINT=GHES you must provide the server base URL via -ghes-url or GHES_URL environment variable")
+		}
+		enterpriseClient,err := github.NewEnterpriseClient(*ghesURL, *ghesURL, tc)
+		if err != nil {
+			log.Fatalf("Failed to create GHES client: %v", err)
+		}
+		client = enterpriseClient
+	default:
+		log.Fatalf("GITHUB_ENDPOINT environment variable must be set to either GHEC or GHES, or left unset for GHES as default")
+	}
 
 	fmt.Println("🏢 Enterprise & Organization Access Test")
 	fmt.Println(strings.Repeat("=", 45))
